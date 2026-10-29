@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Credit Card Payoff Calculator – Debt-Free Date &amp; Interest Saved</title>
+<meta name="description" content="Free credit card payoff calculator. Enter your balance, APR and monthly payment to see your debt-free date, total interest, and how much extra payments save. Works in USD, INR and GBP.">
+<!-- TODO: replace with your real domain -->
+<link rel="canonical" href="https://YOUR-DOMAIN.com/">
+<meta property="og:title" content="Credit Card Payoff Calculator">
+<meta property="og:description" content="See your debt-free date and total interest in seconds.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How is credit card interest calculated?","acceptedAnswer":{"@type":"Answer","text":"Most cards charge interest monthly. The monthly rate is your APR divided by 12, applied to the balance each month. Your payment first covers that interest, and the rest reduces the balance."}},
+{"@type":"Question","name":"Why does paying only the minimum take so long?","acceptedAnswer":{"@type":"Answer","text":"Minimum payments are often just above the monthly interest. Very little reaches the principal, so the balance falls slowly and interest keeps accruing for years."}},
+{"@type":"Question","name":"How much extra should I pay each month?","acceptedAnswer":{"@type":"Answer","text":"Any extra amount helps because it goes straight to principal. Use the calculator to compare your current payment with a higher one and see the interest saved."}},
+{"@type":"Question","name":"Does this calculator include new purchases or fees?","acceptedAnswer":{"@type":"Answer","text":"No. It assumes a fixed APR, a fixed monthly payment and no new spending, late fees or annual fees. Real results can differ."}}]}
+</script>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#13202c; --muted:#5a6876; --line:#dbe2ea;
+  --accent:#1750e6; --accent-ink:#ffffff; --save:#0b8a55; --cost:#c2410c; --field:#f0f3f7;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e151c; --surface:#16202a; --ink:#e8eef4; --muted:#9aa8b6; --line:#27343f;
+    --accent:#6b94ff; --accent-ink:#0a1220; --save:#3fcf93; --cost:#ff9a62; --field:#1d2935; color-scheme:dark;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 "Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:0 18px}
+header.top{padding:28px 0 8px}
+header.top a{font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+h1{font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.1;letter-spacing:-.025em;margin:18px 0 10px;max-width:16ch}
+.lede{color:var(--muted);max-width:56ch;margin:0 0 24px}
+.grid{display:grid;gap:18px;grid-template-columns:1fr}
+@media(min-width:820px){.grid{grid-template-columns:380px 1fr;align-items:start}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+label{display:block;font-weight:600;font-size:.92rem;margin:14px 0 6px}
+label:first-child{margin-top:0}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-height:46px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);padding:4px;border-radius:12px;margin-bottom:6px}
+.seg button{font:inherit;font-weight:600;border:0;border-radius:9px;padding:10px 8px;background:transparent;color:var(--muted);cursor:pointer;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.hint{font-size:.82rem;color:var(--muted);margin-top:4px}
+.err{color:var(--cost);font-weight:600;min-height:1.4em;margin:12px 0 0}
+.date{font-size:clamp(2rem,7vw,3.2rem);line-height:1.05;font-weight:700;letter-spacing:-.03em;margin:4px 0 2px}
+.sub{color:var(--muted);margin:0 0 18px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat{border-top:2px solid var(--line);padding-top:8px}
+.stat b{display:block;font-size:1.3rem;letter-spacing:-.01em}
+.stat span{font-size:.84rem;color:var(--muted)}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--field)}
+.bar i{display:block;height:100%}
+.legend{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted);margin:6px 0 16px}
+.tip{background:var(--field);border-left:4px solid var(--save);border-radius:8px;padding:12px 14px;font-size:.95rem}
+.ad{margin:22px 0;min-height:100px;border:1px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.8rem}
+.tablewrap{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:.92rem}
+th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted)}
+details summary{cursor:pointer;font-weight:600}
+article{margin:34px 0}
+article h2{font-size:1.4rem;letter-spacing:-.015em;margin:28px 0 8px}
+article p,article li{max-width:68ch}
+.info{border-top:1px solid var(--line);padding-top:8px;margin-top:28px}.info h2{font-size:1.3rem;letter-spacing:-.015em;margin:18px 0 8px}.info h3{font-size:1.05rem;margin:16px 0 4px}.info p{max-width:68ch}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:.88rem}
+footer a{color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.date{transition:opacity .2s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><a href="/">PayoffClock</a></header>
+<main>
+<h1>Credit card payoff calculator</h1>
+<p class="lede">Find your debt-free date, total interest, and what a slightly higher payment would save you.</p>
+
+<div class="grid">
+  <section class="card" aria-label="Calculator inputs">
+    <div class="seg" role="group" aria-label="Calculation mode">
+      <button type="button" id="m1" aria-pressed="true">I know my payment</button>
+      <button type="button" id="m2" aria-pressed="false">I have a goal date</button>
+    </div>
+    <label for="cur">Currency</label>
+    <select id="cur">
+      <option value="USD">US dollar ($)</option>
+      <option value="INR">Indian rupee (₹)</option>
+      <option value="GBP">British pound (£)</option>
+    </select>
+    <label for="bal">Card balance</label>
+    <input id="bal" type="number" inputmode="decimal" min="0" step="any" value="5000">
+    <label for="apr">Interest rate (APR %)</label>
+    <input id="apr" type="number" inputmode="decimal" min="0" step="any" value="22">
+    <div class="hint">Find the APR on your card statement.</div>
+    <div id="f1">
+      <label for="pay">Monthly payment</label>
+      <input id="pay" type="number" inputmode="decimal" min="0" step="any" value="200">
+    </div>
+    <div id="f2" hidden>
+      <label for="mon">Months to pay off</label>
+      <input id="mon" type="number" inputmode="numeric" min="1" max="600" step="1" value="24">
+    </div>
+    <p class="err" id="err" role="alert"></p>
+  </section>
+
+  <section class="card" aria-live="polite" aria-label="Results">
+    <p class="sub" id="lead">You’ll be debt-free in</p>
+    <div class="date" id="date">–</div>
+    <p class="sub" id="dur">–</p>
+    <div class="stats">
+      <div class="stat"><b id="rPay">–</b><span id="rPayL">Monthly payment</span></div>
+      <div class="stat"><b id="rInt">–</b><span>Total interest</span></div>
+      <div class="stat"><b id="rTot">–</b><span>Total you’ll pay</span></div>
+      <div class="stat"><b id="rNum">–</b><span>Payments</span></div>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="bP" style="background:var(--accent)"></i><i id="bI" style="background:var(--cost)"></i></div>
+    <div class="legend"><span>Principal</span><span>Interest</span></div>
+    <div class="tip" id="tip"></div>
+    <details style="margin-top:16px"><summary>Year-by-year breakdown</summary>
+      <div class="tablewrap"><table><thead><tr><th>Year</th><th>Paid</th><th>Interest</th><th>Balance</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </details>
+  </section>
+</div>
+
+<!-- AD SLOT 1: paste your AdSense responsive unit here after approval -->
+<div class="ad" aria-hidden="true">Ad space</div>
+
+<article>
+<h2>How the calculator works</h2>
+<p>Each month your card charges interest equal to your APR divided by 12, multiplied by the current balance. Your payment covers that interest first, and whatever is left reduces what you owe. As the balance shrinks, less interest is charged, so more of each payment goes to principal.</p>
+<p>This tool repeats that calculation month by month until the balance reaches zero. It assumes a fixed rate, a fixed payment, and no new purchases or fees.</p>
+<h2>Example</h2>
+<p>A 5,000 balance at 22% APR with a 200 monthly payment takes about 34 months and costs roughly 1,700 in interest. Raising the payment by 20% cuts about seven months and roughly 350 in interest. Try it above with your own numbers.</p>
+<h2>Ways to pay off a card faster</h2>
+<ul>
+<li>Pay more than the minimum, even by a small amount. The extra goes straight to principal.</li>
+<li>Put windfalls such as bonuses or tax refunds toward the balance.</li>
+<li>Ask your issuer for a lower APR, or move the balance to a lower-rate option if the fees make sense.</li>
+<li>Stop adding new purchases to the card while you pay it down.</li>
+</ul>
+<h2>Frequently asked questions</h2>
+<h3>How is credit card interest calculated?</h3>
+<p>Most cards apply the APR divided by 12 to your balance each month. Some issuers compound daily, so your real cost can be slightly higher than shown.</p>
+<h3>Why does paying only the minimum take so long?</h3>
+<p>Minimum payments are often only slightly above the monthly interest, so the balance barely falls and interest keeps building.</p>
+<h3>How much extra should I pay each month?</h3>
+<p>Whatever fits your budget. Use the tip box in the results to see what a 20% higher payment would save.</p>
+<h3>Does this include fees or new purchases?</h3>
+<p>No. Annual fees, late fees and new spending are not included, so treat results as an estimate.</p>
+</article>
+<!-- AD SLOT 2 -->
+<div class="ad" aria-hidden="true">Ad space</div>
+
+<section id="about" class="info">
+<h2>About PayoffClock</h2>
+<p>PayoffClock is a free tool that shows how long it takes to clear a credit card and how much interest you will pay along the way. Enter your balance, interest rate and payment, and the result appears instantly.</p>
+<p>It uses standard monthly compounding: your APR divided by 12 is applied to the balance each month, then your payment is deducted. Fees, new purchases and daily compounding are not included, so results are estimates.</p>
+<p>PayoffClock provides general information only and is not financial advice. For decisions about your debt, speak to a qualified financial advisor.</p>
+</section>
+
+<section id="privacy" class="info">
+<h2>Privacy policy</h2>
+<p>Last updated: [DATE]</p>
+<p><strong>Your calculator inputs stay on your device.</strong> The balance, rate and payment you enter are processed in your browser and are not sent to or stored by us.</p>
+<h3>Advertising</h3>
+<p>We use Google AdSense to show ads. Google and its partners may use cookies to serve ads based on your visits to this and other sites. You can opt out of personalized advertising at <a href="https://www.google.com/settings/ads">google.com/settings/ads</a>. Learn more about <a href="https://policies.google.com/technologies/ads">how Google uses data</a>.</p>
+<h3>Analytics</h3>
+<p>We may use tools such as Google Analytics or Search Console to understand how many people visit. These may set cookies and collect anonymous usage data such as device type and approximate location.</p>
+<h3>Third-party links and your choices</h3>
+<p>We are not responsible for the content or privacy practices of sites we link to. You can block or delete cookies in your browser settings, though this may affect how ads are shown.</p>
+</section>
+
+<section id="contact" class="info">
+<h2>Contact</h2>
+<p>Found a mistake in a calculation or want a feature added? Email <a href="mailto:YOUR-EMAIL@example.com">YOUR-EMAIL@example.com</a>. We aim to reply within a few days.</p>
+</section>
+</main>
+<footer>
+<p>Estimates only. This calculator is for general information and is not financial advice. Your actual card terms may differ.</p>
+<p><a href="#about">About</a> · <a href="#privacy">Privacy</a> · <a href="#contact">Contact</a></p>
+</footer>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var mode=1;
+  function fmt(v){
+    var c=$("cur").value, loc=c==="INR"?"en-IN":(c==="GBP"?"en-GB":"en-US");
+    return new Intl.NumberFormat(loc,{style:"currency",currency:c,maximumFractionDigits:0}).format(v);
+  }
+  function sim(B,apr,P){
+    var r=apr/1200,m=0,int=0,paid=0,bal=B,yrs=[],yP=0,yI=0;
+    while(bal>0.005&&m<1200){
+      var i=bal*r, pay=Math.min(P,bal+i);
+      bal=bal+i-pay; int+=i; paid+=pay; m++; yP+=pay; yI+=i;
+      if(m%12===0||bal<=0.005){yrs.push([Math.ceil(m/12),yP,yI,Math.max(bal,0)]);yP=0;yI=0;}
+    }
+    return {m:m,int:int,paid:paid,yrs:yrs,ok:bal<=0.005};
+  }
+  function need(B,apr,n){
+    var r=apr/1200;
+    return r===0?B/n:B*r/(1-Math.pow(1+r,-n));
+  }
+  function monthsText(m){
+    var y=Math.floor(m/12),mo=m%12,s=[];
+    if(y)s.push(y+(y===1?" year":" years"));
+    if(mo)s.push(mo+(mo===1?" month":" months"));
+    return s.join(" ");
+  }
+  function run(){
+    var B=parseFloat($("bal").value),apr=parseFloat($("apr").value),P,err="";
+    if(!(B>0))err="Enter a balance greater than 0.";
+    else if(!(apr>=0))err="Enter an APR of 0 or more.";
+    if(!err){
+      if(mode===1){
+        P=parseFloat($("pay").value);
+        if(!(P>0))err="Enter a monthly payment greater than 0.";
+        else if(P<=B*apr/1200+0.005)err="Your payment must be higher than the monthly interest ("+fmt(B*apr/1200)+") or the balance will never fall.";
+      }else{
+        var n=parseInt($("mon").value,10);
+        if(!(n>=1&&n<=600))err="Enter between 1 and 600 months.";
+        else P=need(B,apr,n);
+      }
+    }
+    $("err").textContent=err;
+    if(err){["date","dur","rPay","rInt","rTot","rNum"].forEach(function(k){$(k).textContent="–"});$("tip").textContent="";$("rows").innerHTML="";return;}
+    var s=sim(B,apr,P);
+    var d=new Date();d.setMonth(d.getMonth()+s.m);
+    $("date").textContent=d.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+    $("dur").textContent="That’s "+monthsText(s.m)+" from now.";
+    $("rPay").textContent=fmt(P);
+    $("rPayL").textContent=mode===1?"Monthly payment":"Payment needed each month";
+    $("rInt").textContent=fmt(s.int);
+    $("rTot").textContent=fmt(s.paid);
+    $("rNum").textContent=s.m;
+    var tot=B+s.int;
+    $("bP").style.width=(B/tot*100)+"%";
+    $("bI").style.width=(s.int/tot*100)+"%";
+    var s2=sim(B,apr,P*1.2),sv=s.int-s2.int,ms=s.m-s2.m;
+    $("tip").textContent=sv>0.5
+      ?"Paying 20% more ("+fmt(P*1.2)+" a month) would save about "+fmt(sv)+" in interest and finish "+ms+(ms===1?" month":" months")+" sooner."
+      :"Your plan is already close to the fastest possible.";
+    $("rows").innerHTML=s.yrs.map(function(y){
+      return "<tr><td>Year "+y[0]+"</td><td>"+fmt(y[1])+"</td><td>"+fmt(y[2])+"</td><td>"+fmt(y[3])+"</td></tr>";
+    }).join("");
+  }
+  function setMode(n){
+    mode=n;
+    $("m1").setAttribute("aria-pressed",n===1);
+    $("m2").setAttribute("aria-pressed",n===2);
+    $("f1").hidden=n!==1;$("f2").hidden=n!==2;
+    run();
+  }
+  $("m1").onclick=function(){setMode(1)};
+  $("m2").onclick=function(){setMode(2)};
+  ["cur","bal","apr","pay","mon"].forEach(function(k){$(k).addEventListener("input",run)});
+  run();
+})();
+</script>
+</body>
+</html>
