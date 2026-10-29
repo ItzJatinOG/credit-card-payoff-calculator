@@ -28,21 +28,10 @@ All calculations run in your browser. Nothing you enter is sent to a server or s
 
 Plain HTML, CSS and JavaScript in a single `index.html` file. No frameworks, no build step, no dependencies. Hosted on GitHub Pages.
 
-## Run locally
-
-1. Download or clone this repository.
-2. Open `index.html` in any browser.
-
-## Deploy your own copy
-
-1. Fork this repository.
-2. Go to **Settings → Pages**, choose the `main` branch and the `/ (root)` folder.
-3. Replace `YOUR-DOMAIN.com` in `index.html`, `robots.txt` and `sitemap.xml` with your own domain.
-
 ## Related topics
 
 credit card payoff calculator, debt payoff calculator, credit card interest calculator, how long to pay off credit card, debt-free date calculator, credit card APR calculator
 
 ## License
 
-MIT License. You are free to use, copy and modify this project.
+ARR License. You are not allowed to download, copy and modify this project.
