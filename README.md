@@ -2,7 +2,7 @@
 
 A free, fast credit card payoff calculator. Enter your balance, APR and monthly payment to see your **debt-free date**, **total interest** and how much a higher payment would save.
 
-**Live site:** https://YOUR-DOMAIN.com
+**Live site:** [https://YOUR-DOMAIN.com](https://itzjatinog.github.io/credit-card-payoff-calculator/
 
 ## What it does
 
